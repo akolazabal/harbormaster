@@ -2,7 +2,7 @@
 
 Everything needed to file the entry: the X thread draft, the Google Form answers, and the qualification checklist. Fields only the builder can supply are marked `[FILL: …]`.
 
-> **Honest status note (read before posting):** the software core is complete (41 tests passing, `tsc` clean) and on-device DMK signing is demonstrated end-to-end on the Speculos emulator, the legitimate payout is signed on device, the policy-blocked events never reach it, and the compromised transfer is declined on-device (captured screens in `docs/proof/`). The repo is public (https://github.com/akolazabal/harbormaster), and a **48-second walkthrough video built from the real device frames is rendered at `docs/harbormaster-demo.mp4`**, upload it to the thread (X accepts MP4 directly). No real on-chain broadcast has been made (signing is demonstrated via `HM_BROADCAST=0`); fund the device address only if you want a live tx hash. What remains: post the thread (with the video + the architecture screenshot) and file the form.
+> **Honest status note (read before posting):** the software core is complete (41 tests passing, `tsc` clean) and on-device DMK signing is demonstrated end-to-end on the Speculos emulator, the legitimate payout is signed on device, the policy-blocked events never reach it, and the compromised transfer is declined on-device (captured screens in `docs/proof/`). The repo is public (https://github.com/akolazabal/harbormaster), and a **48-second walkthrough video built from the real device frames is rendered at `docs/harbormaster-demo.mp4`**, upload it to the thread (X accepts MP4 directly). No real on-chain broadcast has been made (signing is demonstrated via `HM_BROADCAST=0`); fund the device address only if you want a live tx hash. The thread is posted at https://x.com/AidanOlazabal/status/2062904886178541950; what remains is filing the Google Form.
 
 ---
 
@@ -102,11 +102,11 @@ Fill the official contest Google Form with the following. `[FILL: …]` = builde
 
 | Field | Answer |
 |---|---|
-| **Full name** | [FILL: full name] |
+| **Full name** | Aidan Olazabal |
 | **Email** | aidanolazabal7@gmail.com |
 | **University & blockchain club** | [FILL: university & blockchain club] |
-| **X handle** | [FILL: X handle] |
-| **Link to your post** | [FILL: X thread URL (link to post 1/)] |
+| **X handle** | @AidanOlazabal |
+| **Link to your post** | https://x.com/AidanOlazabal/status/2062904886178541950 |
 | **Which component did you use?** | **Both (DMK + Wallet CLI).** The DMK adapter (`src/signing/dmk.ts`, on `@ledgerhq/device-management-kit`) is genuinely used and demonstrated on the Speculos emulator; the Wallet CLI adapter (`src/signing/walletCli.ts`) is implemented as the production (USB) path. DMK is the demonstrated emulator path; Wallet CLI is the production path. |
 | **Proof of use** | Public repo: https://github.com/akolazabal/harbormaster · working DMK demo (`HM_ADAPTER=dmk npx tsx demo/run.ts --compromised`) · captured device screens in `docs/proof/` (clear-sign of recipient on approve, attacker address on reject) · walkthrough video `docs/harbormaster-demo.mp4` (in the thread) |
 | **Do you accept the Terms & Conditions?** | **Yes** |
@@ -132,4 +132,4 @@ Maps to the contest requirements (spec §11). Check each before filing.
 The build is done: software core complete (41 tests, `tsc` clean), DMK signing demonstrated end-to-end on Speculos (device screens in `docs/proof/`), demo clear-signs the recipient via native ETH, walkthrough video rendered at `docs/harbormaster-demo.mp4`, and the repo is public. What remains:
 
 1. **(Optional) Fund for a real broadcast.** Send Base Sepolia faucet ETH to `0xDad77910DbDFdE764fC21FCD4E74D71bBACA6D8D` and run the demo without `HM_BROADCAST=0` to land a real on-chain tx hash. Signing is already demonstrated without this.
-2. **Post** the thread (post **1/** tags @Ledger with a visible #LedgerSponsor; attach the video to **1/** and the architecture screenshot to **3/**) and **file** the Google Form (component = Both).
+2. **File** the Google Form (component = Both). The thread is already posted at https://x.com/AidanOlazabal/status/2062904886178541950 (link in the answers above).

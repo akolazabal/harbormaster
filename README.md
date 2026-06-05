@@ -9,9 +9,9 @@
 
 ## Demo
 
-**Watch the 48-second walkthrough: [docs/harbormaster-demo.mp4](docs/harbormaster-demo.mp4)** (plays on its GitHub file page).
+https://github.com/user-attachments/assets/b77822da-1984-4d7f-a230-4bfcbfe1a303
 
-Built from the real Speculos device frames: a legitimate payout signed on the device, the policy-blocked events that never reach it, and a compromised transfer declined on-device. The captured device screens are in [docs/proof/](docs/proof/).
+A 48-second walkthrough built from the real Speculos device frames: a legitimate payout signed on the device, the policy-blocked events that never reach it, and a compromised transfer declined on-device. The video is also committed at [docs/harbormaster-demo.mp4](docs/harbormaster-demo.mp4), and the captured device screens are in [docs/proof/](docs/proof/).
 
 ## The problem
 
