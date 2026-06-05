@@ -1,0 +1,24 @@
+{
+  "name": "harbormaster",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "typecheck": "tsc --noEmit",
+    "demo": "tsx demo/run.ts",
+    "speculos": "bash scripts/speculos.sh"
+  },
+  "dependencies": {
+    "viem": "^2.21.0"
+  },
+  "devDependencies": {
+    "@ledgerhq/hw-app-eth": "^7.8.4",
+    "@ledgerhq/hw-transport-node-speculos": "^6.34.2",
+    "@types/node": "^22.0.0",
+    "tsx": "^4.19.0",
+    "typescript": "^5.6.0",
+    "vitest": "^2.1.0"
+  }
+}

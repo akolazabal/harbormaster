@@ -2,7 +2,7 @@
 
 Everything needed to file the entry: the X thread draft, the Google Form answers, and the qualification checklist. Fields only the builder can supply are marked `[FILL: …]`.
 
-> **Honest status note (read before posting):** the software core is complete (41 tests passing, `tsc` clean) and on-device DMK signing is demonstrated end-to-end on the Speculos emulator — the legitimate payout is signed on device, the policy-blocked events never reach it, and the compromised transfer is declined on-device (captured screens in `docs/proof/`). What remains is optional funding for a real on-chain broadcast, recording the walkthrough video, publishing the repo, and posting. **The video has not been recorded yet** and no real on-chain broadcast has been made (signing is demonstrated via `HM_BROADCAST=0`). Do not post the thread with a video link until the recording exists; keep the `[FILL: demo video link]` placeholder until then.
+> **Honest status note (read before posting):** the software core is complete (41 tests passing, `tsc` clean) and on-device DMK signing is demonstrated end-to-end on the Speculos emulator — the legitimate payout is signed on device, the policy-blocked events never reach it, and the compromised transfer is declined on-device (captured screens in `docs/proof/`). The repo is public (https://github.com/akolazabal/harbormaster), and a **48-second walkthrough video built from the real device frames is rendered at `docs/harbormaster-demo.mp4`** — upload it to X (which accepts MP4 directly) and drop the link into post 5/. No real on-chain broadcast has been made (signing is demonstrated via `HM_BROADCAST=0`); fund the device address only if you want a live tx hash. What remains: upload the video, post the thread, and file the form.
 
 ---
 
@@ -75,7 +75,7 @@ Fill the official contest Google Form with the following. `[FILL: …]` = builde
 | **X handle** | [FILL: X handle] |
 | **Link to your post** | [FILL: X post URL] |
 | **Which component did you use?** | **Both (DMK + Wallet CLI).** The DMK adapter (`src/signing/dmk.ts`, on `@ledgerhq/device-management-kit`) is genuinely used and demonstrated on the Speculos emulator; the Wallet CLI adapter (`src/signing/walletCli.ts`) is implemented as the production (USB) path. DMK is the demonstrated emulator path; Wallet CLI is the production path. |
-| **Proof of use** | Public repo: https://github.com/akolazabal/harbormaster · working DMK demo (`HM_ADAPTER=dmk npx tsx demo/run.ts --compromised`) · captured device screens in `docs/proof/` (clear-sign of recipient on approve, attacker address on reject) · demo video: [FILL: demo video link] |
+| **Proof of use** | Public repo: https://github.com/akolazabal/harbormaster · working DMK demo (`HM_ADAPTER=dmk npx tsx demo/run.ts --compromised`) · captured device screens in `docs/proof/` (clear-sign of recipient on approve, attacker address on reject) · walkthrough video `docs/harbormaster-demo.mp4` (upload to X → [FILL: demo video link]) |
 | **Do you accept the Terms & Conditions?** | **Yes** |
 | **Repository URL** | https://github.com/akolazabal/harbormaster |
 
@@ -99,6 +99,6 @@ Maps to the contest requirements (spec §11). Check each before filing.
 The emulator phase is done: Speculos is up (`npm run speculos`), the DMK adapter signs end-to-end on device, the demo clear-signs the recipient via native ETH, and device screens are captured in `docs/proof/`. What remains:
 
 1. **(Optional) Fund for a real broadcast.** Send Base Sepolia faucet ETH to the device address `0xDad77910DbDFdE764fC21FCD4E74D71bBACA6D8D` and run the demo without `HM_BROADCAST=0` to land a real on-chain tx and capture its hash. Signing is already demonstrated without this.
-2. **Record** the walkthrough per `demo/record.md` (Act 1 approve + Act 2 reject); upload; fill the `[FILL: …]` links above.
+2. **Video** — ✅ rendered at `docs/harbormaster-demo.mp4` (48s, built from real device frames via `scripts/make_video.py`). Upload it to X and fill the `[FILL: demo video link]`. (Optional: capture a live screen recording with `demo/live-view.html` for an even more "live" feel.)
 3. **Publish** the repo — ✅ done: https://github.com/akolazabal/harbormaster
 4. **Post** the thread and **file** the Google Form.
