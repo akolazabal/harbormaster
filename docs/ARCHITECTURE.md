@@ -64,7 +64,7 @@ Because `evaluate` is a pure function of `(intent, config, day)`, every property
 
 **Role:** the privileged unit. Takes approved intents, assembles the transaction, drives the signing gate, and records the outcome.
 
-- **`tx.ts` — transaction assembly.** `buildUsdcTransfer(intent, usdcContract)` encodes an ERC-20 `transfer(to, amount)` with viem (`parseUnits` at 6 decimals for USDC), targeting the USDC contract with `value: 0n` and `chainId: 84532` (Base Sepolia). The `UnsignedTx` also surfaces `recipient` and `amountUsdc` explicitly so they can be displayed and audited.
+- **`tx.ts` — transaction assembly.** `buildTransfer(intent, usdcContract)` dispatches on `intent.asset`: `buildUsdcTransfer` encodes an ERC-20 `transfer(to, amount)` with viem (`parseUnits` at 6 decimals for USDC), targeting the USDC contract with `value: 0n`; `buildNativeTransfer` builds a native value transfer (`parseEther`, `data: "0x"`) straight to the recipient. Both set `chainId: 84532` (Base Sepolia) and surface `recipient` and `amountUsdc` explicitly so they can be displayed and audited. Production settles in USDC; the testnet demo uses native ETH so the device can clear-sign the recipient (see the clear-signing note below).
 - **`settler.ts` — orchestration.** `settleOne(intent, deps, day, prev)` is the pipeline:
   1. `evaluate` the intent. If `BLOCKED`, record `signing: NOT_ATTEMPTED` and return — **no transaction is built, the signing adapter is never called, and the day's spend is unchanged.**
   2. Otherwise build the `UnsignedTx` and call `adapter.signAndBroadcast(tx)`.
@@ -87,19 +87,20 @@ export interface SigningAdapter {
 }
 ```
 
-`SigningResult` is `{ status: "APPROVED"; txHash } | { status: "REJECTED" }`. Three implementations, selected by the `HM_ADAPTER` env var via `select.ts`:
+`SigningResult` is `{ status: "APPROVED"; txHash } | { status: "REJECTED" }`. Four implementations, selected by the `HM_ADAPTER` env var via `select.ts`:
 
 1. **`mock.ts` (`mock`)** — an in-memory adapter that returns a configured `APPROVED`/`REJECTED` without a device. Used by the test suite and the no-device dry run. It is a stand-in for the transport, **not** a stand-in for the hardware control: it makes no human decision, so a `mock` run of the compromised-agent scenario auto-approves — which the demo runner states explicitly, because the absence of the human-in-the-loop review is precisely what the on-device step provides.
-2. **`walletCli.ts` (`wallet-cli`)** — the **Ledger Wallet CLI** path. Shells out to `wallet-cli send <label> --to … --amount "<n> USDC" --format json` and parses the JSON for a broadcast tx hash, mapping device rejections (`reject`/`denied`/`cancel`) to `REJECTED`. The agentic entry point.
-3. **`speculos.ts` (`speculos`)** — the on-device signing path over `@ledgerhq/hw-transport-node-speculos` and `@ledgerhq/hw-app-eth` (Ledger's transport + Ethereum-app SDK). It opens the Speculos transport, derives the device address at `44'/60'/0'/0/0`, builds an EIP-1559 transaction (estimating nonce/fees/gas via viem against the Base Sepolia RPC), serializes it, requests a clear-signing **resolution**, signs on the device, and broadcasts the signed transaction. A device cancel (APDU `0x6985`) maps to `REJECTED`. **Note:** `hw-transport`/`hw-app-eth` is Ledger's signing stack but is **not** the DMK package (`@ledgerhq/device-management-kit`); a dedicated DMK adapter is the emulator-phase next step — see [EMULATOR-TODO.md](EMULATOR-TODO.md).
+2. **`walletCli.ts` (`wallet-cli`)** — the **Ledger Wallet CLI** path, the agentic entry point. Shells out to `wallet-cli send <label> --to … --amount "<n> USDC" --format json` and parses the JSON for a broadcast tx hash, mapping device rejections (`reject`/`denied`/`cancel`) to `REJECTED`. This is the production (USB) path; the Wallet CLI has no Speculos transport, so it is code-complete but not exercised on the emulator.
+3. **`dmk.ts` (`dmk`)** — the **genuine Device Management Kit** path, built on `@ledgerhq/device-management-kit` with `@ledgerhq/device-transport-kit-speculos` and `@ledgerhq/device-signer-kit-ethereum`. It builds a `DeviceManagementKit` with the Speculos HTTP transport (automation API, default `http://127.0.0.1:5005`), discovers and connects to the device, builds the Ethereum signer, derives the address at `44'/60'/0'/0/0`, assembles an EIP-1559 transaction (nonce/fees/gas via viem against the Base Sepolia RPC), and runs the signer's `signTransaction` device action — the device prompts for review here. An on-device decline (APDU `0x6985`, "condition not satisfied") maps to `REJECTED`. With `HM_BROADCAST=0` it returns the signed transaction's hash without sending; otherwise it broadcasts via viem. **This is the adapter demonstrated on the Speculos emulator** (see the device screenshots in `docs/proof/`).
+4. **`speculos.ts` (`speculos`)** — an on-device signing path over `@ledgerhq/hw-transport-node-speculos` and `@ledgerhq/hw-app-eth` (Ledger's transport + Ethereum-app SDK). It opens the Speculos transport, derives the device address at `44'/60'/0'/0/0`, builds an EIP-1559 transaction, serializes it, requests a clear-signing **resolution** for contract calls, signs on the device, and broadcasts (or, with `HM_BROADCAST=0`, returns the signed tx's hash without sending). A device cancel (APDU `0x6985`) maps to `REJECTED`. **Note:** this adapter's `hw-transport`/`hw-app-eth` stack is Ledger's signing SDK but is **not** the DMK package (`@ledgerhq/device-management-kit`) — the genuine DMK integration is the `dmk` adapter above. This adapter predates it and is kept as a fallback.
 
-This `SigningAdapter` shape lets the build **target both** Ledger components — the Wallet CLI (implemented) and the DMK (the adapter above is built on Ledger's transport SDK; the dedicated DMK adapter is the next step) — through one interface, and stay resilient: if one signing path is unavailable on a given machine, another can carry the proof. Report **"Both"** on the contest form only once the genuine DMK adapter is wired up; until then the accurate answer is **"Wallet CLI."**
+This `SigningAdapter` shape lets the build use **both** Ledger components — the DMK (`dmk`, demonstrated on the emulator) and the Wallet CLI (`walletCli`, implemented for production) — through one interface, and stay resilient: if one signing path is unavailable on a given machine, another can carry the proof. Because both are genuinely used, the accurate contest-form answer is **"Both."**
 
-**A note on clear-signing.** The device showing the *real* recipient and amount is the entire point of the on-device step. The Speculos adapter requests a clear-signing resolution so the Ethereum app can decode `transfer(to, amount)`; the installed `@ledgerhq/hw-app-eth` did not expose the resolution helper as a runtime export, so the adapter currently loads it lazily and falls back to a null resolution (blind signing) if it is absent. Restoring full clear-signing — via the correct resolution API for the pinned SDK version, ERC-20 token resolution for testnet USDC, or, as a fallback, a native testnet-ETH transfer (which clear-signs recipient and amount with no token resolution needed) — is the top item in [EMULATOR-TODO.md](EMULATOR-TODO.md).
+**A note on the testnet asset and clear-signing.** The device showing the *real* recipient and amount is the entire point of the on-device step. The demo therefore settles in **native Base Sepolia ETH**, which clear-signs the recipient and amount natively with no token resolution needed (`demo/run.ts` loads events as `ETH` and uses `buildNativeTransfer`). Testnet USDC isn't in Ledger's clear-signing registry, so an ERC-20 `transfer(to, amount)` would not display the recipient on the device — which is why native ETH is used to demonstrate the clear-sign. Production Tide settles in USDC; the codebase still assembles USDC transfers (`buildUsdcTransfer`, dispatched by `buildTransfer` on `intent.asset`), and the `speculos` adapter requests an ERC-20 clear-signing resolution lazily when signing a contract call (falling back to null resolution if the installed `@ledgerhq/hw-app-eth` does not expose the helper).
 
 ### The Ledger device (Speculos)
 
-The device runs the Ethereum app under Speculos in Docker, exposing the APDU TCP server on `:9999` and the automation/REST API on `:5000`. Clear-signing displays the recipient and amount on the device screen; a human approves or rejects, and the automation API can script that for a clean recording while leaving a manual mode available.
+The device runs the Ethereum app under Speculos in Docker (on macOS, via Colima), exposing the APDU TCP server on `127.0.0.1:9999` and the automation/REST API on host `http://127.0.0.1:5005` (the container's `:5000`, remapped because macOS AirPlay occupies host port 5000). `scripts/speculos.sh` (`npm run speculos`) downloads the Ethereum app ELF on first run and launches it. Clear-signing displays the recipient and amount on the device screen; a human approves or rejects, and `demo/device.ts` drives the automation API to play that part for a headless recording, leaving a manual mode available. `demo/live-view.html` polls the `/screenshot` endpoint so the device screen can be watched in a browser.
 
 ## The hash-chained audit log — `src/settler/audit.ts`
 
@@ -124,9 +125,9 @@ type SettlementIntent = {
   milestone: Milestone;
   counterpartyName: string;
   counterpartyAddress: `0x${string}`;
-  asset: "USDC";
+  asset: "USDC" | "ETH";     // USDC in production; native ETH for the clear-signed testnet demo
   chain: "base-sepolia";
-  amount: string;            // decimal USDC, e.g. "2500.00"
+  amount: string;            // decimal, e.g. "2500.00" (USDC) or "0.001" (ETH)
   sourceEventRaw: string;    // untrusted original event text, retained for audit
   createdAt: string;         // ISO 8601
 };
@@ -147,7 +148,7 @@ type PolicyConfig = {
   perTxCapUsdc: number;
   dailyCapUsdc: number;
   allowedChains: ["base-sepolia"];
-  allowedAssets: ["USDC"];
+  allowedAssets: ("USDC" | "ETH")[];
 };
 
 type DayState = { date: string; spentUsdc: number };
@@ -179,8 +180,8 @@ type AuditRecord = {
 ## Configuration
 
 - **`config/policy.json`** — the allowlist (named counterparties), denylist, `perTxCapUsdc`, `dailyCapUsdc`, and the chain/asset whitelists. Loaded and validated by `src/shared/config.ts`.
-- **Environment** (`.env.example`) — `HM_RPC_URL` (Base Sepolia RPC), `HM_USDC` (testnet USDC contract), `HM_ACCOUNT` (CLI account label / derivation), `HM_ADAPTER` (`mock` \| `wallet-cli` \| `speculos`), and the Speculos endpoints.
+- **Environment** (`.env.example`) — `HM_RPC_URL` (Base Sepolia RPC), `HM_USDC` (testnet USDC contract), `HM_ACCOUNT` (CLI account label / derivation), `HM_ADAPTER` (`mock` \| `wallet-cli` \| `dmk` \| `speculos`), `HM_BROADCAST` (set to `0` to sign without broadcasting), and the Speculos endpoints (`SPECULOS_API`, default `http://127.0.0.1:5005`).
 
 ## Test surface
 
-35 tests across the units: shared types, canonical hashing and chaining, config loading, the watcher (including the quarantine guarantees), the policy engine and its adversarial suite, the audit log (including tamper detection), the transaction builder, the settler orchestration, and the Wallet CLI adapter (driven by a stub binary so it is deterministic and needs no device).
+41 tests across the units: shared types, canonical hashing and chaining, config loading, the watcher (including the quarantine guarantees), the policy engine and its adversarial suite, the audit log (including tamper detection), the transaction builder (ERC-20 and native), the settler orchestration, and the Wallet CLI adapter (driven by a stub binary so it is deterministic and needs no device).

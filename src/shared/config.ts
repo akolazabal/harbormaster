@@ -16,7 +16,7 @@ export type Env = {
   rpcUrl: string;
   usdcContract: `0x${string}`;
   account: string;
-  adapter: "mock" | "wallet-cli" | "speculos";
+  adapter: "mock" | "wallet-cli" | "speculos" | "dmk";
 };
 
 export function loadEnv(): Env {

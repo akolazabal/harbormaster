@@ -1,6 +1,6 @@
 import type { SettlementIntent, PolicyConfig, DayState, AuditRecord } from "../shared/types.js";
 import { evaluate } from "../policy/policy.js";
-import { buildUsdcTransfer } from "./tx.js";
+import { buildTransfer } from "./tx.js";
 import { buildRecord } from "./audit.js";
 import type { SigningAdapter } from "../signing/adapter.js";
 
@@ -22,7 +22,7 @@ export async function settleOne(
     return { record: buildRecord(prev, intent, policy, { status: "NOT_ATTEMPTED" }), day };
   }
 
-  const tx = buildUsdcTransfer(intent, deps.usdcContract);
+  const tx = buildTransfer(intent, deps.usdcContract);
   const result = await deps.adapter.signAndBroadcast(tx);
 
   if (result.status === "REJECTED") {

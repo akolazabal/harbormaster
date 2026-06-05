@@ -1,4 +1,4 @@
-import { encodeFunctionData, parseUnits, getAddress } from "viem";
+import { encodeFunctionData, parseUnits, parseEther, getAddress } from "viem";
 import type { SettlementIntent, UnsignedTx } from "../shared/types.js";
 
 export const BASE_SEPOLIA_CHAIN_ID = 84532;
@@ -16,6 +16,25 @@ const USDC_ABI = [
     outputs: [{ name: "", type: "bool" }],
   },
 ] as const;
+
+export function buildNativeTransfer(intent: SettlementIntent): UnsignedTx {
+  const recipient = getAddress(intent.counterpartyAddress);
+  const value = parseEther(intent.amount);
+  return {
+    to: recipient,
+    data: "0x",
+    value,
+    chainId: BASE_SEPOLIA_CHAIN_ID,
+    recipient,
+    amountUsdc: intent.amount,
+  };
+}
+
+export function buildTransfer(intent: SettlementIntent, usdcContract: `0x${string}`): UnsignedTx {
+  return intent.asset === "ETH"
+    ? buildNativeTransfer(intent)
+    : buildUsdcTransfer(intent, usdcContract);
+}
 
 export function buildUsdcTransfer(intent: SettlementIntent, usdcContract: `0x${string}`): UnsignedTx {
   const recipient = getAddress(intent.counterpartyAddress);
