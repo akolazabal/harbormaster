@@ -16,7 +16,15 @@ export function walletCliAdapter(opts: { label: string; bin?: string }): Signing
         const { stdout } = await pexec(bin, args, { timeout: 180_000 });
         const out = JSON.parse(stdout);
         const txHash = out.txHash ?? out.hash ?? out.operationHash;
-        return txHash ? { status: "APPROVED", txHash } : { status: "REJECTED" };
+        if (txHash) {
+          const hash = String(txHash);
+          if (!hash.startsWith("0x")) throw new Error(`wallet-cli returned a non-0x tx hash: ${hash}`);
+          return { status: "APPROVED", txHash: hash as `0x${string}` };
+        }
+        // Exit 0 with an explicit rejection signal in the JSON → user rejected on device.
+        if (/reject|denied|cancel/i.test(JSON.stringify(out))) return { status: "REJECTED" };
+        // Exit 0 but no hash and no rejection signal → likely a misconfigured flag/JSON shape; surface it.
+        throw new Error(`wallet-cli exited 0 but returned no tx hash (check send flags / JSON shape). Raw output: ${stdout}`);
       } catch (e: any) {
         if (/reject|denied|cancel/i.test(String(e?.stderr ?? e?.message ?? ""))) return { status: "REJECTED" };
         throw e;

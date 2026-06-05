@@ -24,3 +24,14 @@ test("treats reject stderr as REJECTED", async () => {
   const r = await walletCliAdapter({ label: "x", bin }).signAndBroadcast(tx);
   expect(r).toEqual({ status: "REJECTED" });
 });
+
+test("treats explicit JSON rejection on exit 0 as REJECTED", async () => {
+  const bin = stub('#!/usr/bin/env bash\necho \'{"status":"rejected"}\'\n');
+  const r = await walletCliAdapter({ label: "x", bin }).signAndBroadcast(tx);
+  expect(r).toEqual({ status: "REJECTED" });
+});
+
+test("throws a diagnostic when CLI exits 0 but returns no tx hash", async () => {
+  const bin = stub('#!/usr/bin/env bash\necho \'{"status":"ok"}\'\n');
+  await expect(walletCliAdapter({ label: "x", bin }).signAndBroadcast(tx)).rejects.toThrow(/no tx hash/);
+});
