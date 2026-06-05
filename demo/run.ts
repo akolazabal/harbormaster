@@ -16,7 +16,7 @@ async function main() {
   const config = loadPolicyConfig("config/policy.demo.json");
   const env = loadEnv();
   const adapter = selectAdapter();
-  const useDevice = adapter.name === "speculos";
+  const useDevice = adapter.name === "speculos" || adapter.name === "dmk";
   // Testnet demo settles in native Base Sepolia ETH (clear-signs the recipient on-device).
   // Production Tide settles in USDC; testnet USDC isn't in Ledger's clear-signing registry.
   const intents = loadEvents(join("demo", "events"), "ETH");

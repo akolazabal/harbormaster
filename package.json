@@ -11,6 +11,10 @@
     "speculos": "bash scripts/speculos.sh"
   },
   "dependencies": {
+    "@ledgerhq/device-management-kit": "^1.5.1",
+    "@ledgerhq/device-signer-kit-ethereum": "^1.16.0",
+    "@ledgerhq/device-transport-kit-speculos": "^1.2.1",
+    "rxjs": "^7.8.2",
     "viem": "^2.21.0"
   },
   "devDependencies": {

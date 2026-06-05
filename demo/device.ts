@@ -37,8 +37,9 @@ export async function driveDevice(action: "approve" | "reject"): Promise<boolean
   const target = action === "approve" ? /sign transaction/i : /reject/i;
 
   // 1) Wait for the review to start (Speculos draws "Review transaction"/"Amount"/...).
+  // Generous window: the adapter may spend several seconds on discovery/connect/RPC before signing.
   let started = false;
-  for (let i = 0; i < 50 && !started; i++) {
+  for (let i = 0; i < 250 && !started; i++) {
     await wait(200);
     if (/review transaction|amount|max fees|to\b/i.test(await screenText())) started = true;
   }
