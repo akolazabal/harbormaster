@@ -1,22 +1,25 @@
-# Emulator integration TODO (deferred from the core build)
+# Emulator phase — mostly complete
 
-The software core is complete: **35 tests passing, `tsc` clean**, full pipeline (watcher → policy → settler → audit) runs on the mock adapter. The items below require a running **Speculos emulator (Docker)** + a funded **Base Sepolia** account and must be completed before recording the demo video. They are deferred because Docker is not installed locally yet.
+The emulator phase is **done**: on-device signing works end-to-end through the genuine Ledger Device Management Kit on the Speculos emulator. The software core is complete too — **41 tests passing, `tsc` clean**, full pipeline (watcher → policy → settler → audit). What remains is optional funding for a real on-chain broadcast, the walkthrough recording, and publishing.
 
-## Checklist (do in order)
+## Done
 
-1. **Stand up Speculos** — `npm run speculos` (`scripts/speculos.sh`) with the Ethereum app. Confirm APDU `:9999` + automation API `:5000`. (Plan Task 0.3.)
-2. **Install + probe the Wallet CLI** — `npm i -g @ledgerhq/wallet-cli`; `npx skills add` the DMK + wallet-cli skills; capture `wallet-cli send --help` and any emulator transport hook. (Plan Task 0.2.)
-3. **Signing spike / go-no-go** — sign one Base Sepolia USDC transfer end-to-end; pick the working adapter (`wallet-cli` vs `speculos`). (Plan Task 0.5.)
-4. **CLEAR SIGNING — critical for the demo.** `src/signing/speculos.ts` currently falls back to **null resolution → blind signing** (the installed `@ledgerhq/hw-app-eth` did not expose `ledgerService` as a runtime export). The device MUST display the **recipient address + USDC amount** on screen — that is the demo's key moment. Resolve by either:
-   - using the correct clear-signing/resolution API for the installed `@ledgerhq/hw-app-eth` version so the Ethereum app decodes `transfer(to, amount)`; or
-   - providing ERC-20 token resolution for testnet USDC; or
-   - **fallback:** demonstrate with a native testnet ETH transfer (recipient + amount clear-sign natively, no token resolution needed) — still proves "the device shows the real recipient and the human rejects."
-5. **Runtime-verify the typed-cast SDK entry points** (`SpeculosTransport.open`, `new Eth(...)`) in `speculos.ts` against the live emulator (they typecheck via minimal `unknown` casts; confirm runtime behavior).
-6. **Wallet CLI adapter** — confirm the exact `send` flags + JSON output shape against the real CLI; update `src/signing/walletCli.ts` if the field names differ.
-7. **Funding** — confirm the Base Sepolia testnet USDC contract; fund the derived account with faucet ETH (gas) + testnet USDC. (Plan Task 0.4.)
-8. **Live run** — `HM_ADAPTER=speculos npx tsx demo/run.ts --compromised`; approve evt-001, reject the compromised tx; capture the real tx hash on sepolia.basescan.org.
-9. **Record** — per `demo/record.md`.
-10. **(To report "Both" on the form) Genuine DMK adapter** — implement a `dmk` adapter on `@ledgerhq/device-management-kit` (+ its ETH signer + a node/Speculos transport) behind the existing `SigningAdapter` interface. Can be built independently of the steps above. Until this is done and run, the honest contest component answer is **"Wallet CLI"** — the current `speculos.ts` adapter uses Ledger's `hw-transport`/`hw-app-eth` stack, which is not the DMK package.
+1. **Speculos up.** `npm run speculos` (`scripts/speculos.sh`) auto-downloads the Ethereum app ELF and runs Speculos via Docker (on macOS, Colima: `colima start --vm-type vz --vz-rosetta`). Automation/REST API on host `http://127.0.0.1:5005` (the container's `:5000`; host 5000 is taken by macOS AirPlay), APDU on `127.0.0.1:9999`.
+2. **Transport confirmed.** The DMK Speculos transport (`@ledgerhq/device-transport-kit-speculos`) discovers and connects to the device; the SDK entry points are runtime-verified against the live emulator.
+3. **Clear-signing via native ETH.** The demo settles in native Base Sepolia ETH, which clear-signs the recipient and amount on screen with no token resolution needed — the device's key moment. (Testnet USDC isn't in Ledger's clear-signing registry, so an ERC-20 transfer would not display the recipient; production Tide settles in USDC, and `buildUsdcTransfer` remains in the codebase.)
+4. **Genuine DMK adapter, built + demonstrated.** `src/signing/dmk.ts` uses `@ledgerhq/device-management-kit` + `@ledgerhq/device-transport-kit-speculos` + `@ledgerhq/device-signer-kit-ethereum`. Verified end-to-end with `HM_ADAPTER=dmk npx tsx demo/run.ts --compromised`: evt-001 signed on device; evt-002/003 policy-blocked (never reach the device); the compromised transfer declined on-device (APDU `0x6985` → `REJECTED`). This makes the contest component answer an honest **"Both"** (DMK demonstrated on the emulator; Wallet CLI implemented for production).
+5. **Sign-without-funding path.** `HM_BROADCAST=0` runs the full signing flow on an unfunded account (the device signs; the reported hash is the signed tx's hash, with no on-chain send).
+6. **Proof captured.** `docs/proof/legit-approve-03.png` (device shows `To 0x1111…1111`) and `docs/proof/attacker-reject-03.png` (`To 0x00…dEaD`), plus the full review sequences. The Speculos seed derives the device address `0xDad77910DbDFdE764fC21FCD4E74D71bBACA6D8D`.
+7. **Funding instructions documented** (below).
 
-## Note
-None of the above changes the deterministic core (policy/watcher/settler/audit), which is done and tested. This is purely the hardware-signing seam + recording.
+## Remaining
+
+1. **(Optional) Fund for a real broadcast.** Send Base Sepolia faucet ETH to `0xDad77910DbDFdE764fC21FCD4E74D71bBACA6D8D`, then run the demo without `HM_BROADCAST=0` to land a real on-chain tx and capture its hash on sepolia.basescan.org. Signing is already demonstrated without this; broadcast is the only step that needs funds.
+2. **Record** per `demo/record.md` (Act 1 approve + Act 2 reject). `demo/live-view.html` shows the device screen in a browser during the run.
+3. **Publish** the repo and post the thread / file the form (tracked in `docs/SUBMISSION.md`).
+
+## Notes
+
+- The **Wallet CLI** adapter (`src/signing/walletCli.ts`) is the production (USB) path. The Wallet CLI has no Speculos transport, so it is code-complete but not exercised on the emulator — the demonstrated emulator path is the DMK adapter.
+- The `src/signing/speculos.ts` adapter (Ledger's `hw-transport`/`hw-app-eth` stack — not the DMK package) predates the `dmk` adapter and is kept as a fallback.
+- None of this changes the deterministic core (policy/watcher/settler/audit), which is done and tested.

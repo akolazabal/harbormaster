@@ -2,7 +2,7 @@
 
 Everything needed to file the entry: the X thread draft, the Google Form answers, and the qualification checklist. Fields only the builder can supply are marked `[FILL: …]`.
 
-> **Honest status note (read before posting):** the software core is complete (35 tests passing, `tsc` clean) and the full pipeline runs on the mock adapter. **Live on-device signing on Speculos has not been recorded yet** — it is the documented next step (see `docs/EMULATOR-TODO.md`). Do not post the thread with a video link until the recording exists. Keep the `[FILL: demo video link]` placeholder until then.
+> **Honest status note (read before posting):** the software core is complete (41 tests passing, `tsc` clean) and on-device DMK signing is demonstrated end-to-end on the Speculos emulator — the legitimate payout is signed on device, the policy-blocked events never reach it, and the compromised transfer is declined on-device (captured screens in `docs/proof/`). What remains is optional funding for a real on-chain broadcast, recording the walkthrough video, publishing the repo, and posting. **The video has not been recorded yet** and no real on-chain broadcast has been made (signing is demonstrated via `HM_BROADCAST=0`). Do not post the thread with a video link until the recording exists; keep the `[FILL: demo video link]` placeholder until then.
 
 ---
 
@@ -46,7 +46,7 @@ That's the layer hardware adds.
 [FILL: demo video link]
 
 **6/**
-Built with both halves of the Ledger Agent Stack — DMK + Wallet CLI — via one signing-adapter interface. Repo (architecture + the thesis writeup + 35 passing tests):
+Built with both halves of the Ledger Agent Stack — DMK + Wallet CLI — via one signing-adapter interface. Repo (architecture + the thesis writeup + 41 passing tests):
 
 [FILL: repo URL]
 
@@ -58,8 +58,8 @@ The takeaway I'd stand behind: give the agent the work, keep the final authority
 
 - **Disclosure placement:** `#LedgerSponsor` is in post **1/** and visible without expanding. `@Ledger` is tagged in post 1 and again in the close.
 - **No absolute claims:** the thread says "blocks it," "declines," "nothing moves" about *this* demonstrated scenario — not "unhackable" or "can't be stolen." Keep it that way in any edits.
-- **Video:** only fill `[FILL: demo video link]` once the Speculos run is actually recorded (Act 1 approve + Act 2 reject, with a real Base Sepolia tx hash). Until then the build's proof is the public repo + the signing-flow code; you can post the thread without the video, or wait for it.
-- **Screenshots:** when you record, grab (a) the terminal showing `APPROVED_FOR_REVIEW` / `BLOCKED [reasons]`, (b) the Speculos screen showing recipient + amount, (c) the broadcast tx on sepolia.basescan.org.
+- **Video:** only fill `[FILL: demo video link]` once the Speculos run is actually recorded (Act 1 approve + Act 2 reject). A real Base Sepolia tx hash requires funding the device address first (optional — the signing flow is already demonstrated via `HM_BROADCAST=0`). Until the video exists, the build's proof is the public repo + the working DMK demo + the captured device screens in `docs/proof/`; you can post the thread without the video, or wait for it.
+- **Screenshots:** device screens are already captured in `docs/proof/` — `legit-approve-03.png` (device shows `To 0x1111…1111`) and `attacker-reject-03.png` (`To 0x00…dEaD`), plus the full review sequences. The Speculos seed derives the device address `0xDad77910DbDFdE764fC21FCD4E74D71bBACA6D8D`. When you record, also grab the terminal showing `APPROVED_FOR_REVIEW` / `BLOCKED [reasons]`, and — if you fund the account and broadcast — the tx on sepolia.basescan.org.
 
 ---
 
@@ -74,8 +74,8 @@ Fill the official contest Google Form with the following. `[FILL: …]` = builde
 | **University & blockchain club** | [FILL: university & blockchain club] |
 | **X handle** | [FILL: X handle] |
 | **Link to your post** | [FILL: X post URL] |
-| **Which component did you use?** | **Wallet CLI** as built today; report **Both** (DMK + Wallet CLI) only once the DMK adapter is genuinely wired up (emulator phase). Choose whichever is true at submission time — the contest verifies tool use. |
-| **Proof of use** | Public repo: [FILL: repo URL] · signing-flow screenshots (terminal policy decisions + Speculos clear-sign screen + Base Sepolia tx) · demo video: [FILL: demo video link] |
+| **Which component did you use?** | **Both (DMK + Wallet CLI).** The DMK adapter (`src/signing/dmk.ts`, on `@ledgerhq/device-management-kit`) is genuinely used and demonstrated on the Speculos emulator; the Wallet CLI adapter (`src/signing/walletCli.ts`) is implemented as the production (USB) path. DMK is the demonstrated emulator path; Wallet CLI is the production path. |
+| **Proof of use** | Public repo: [FILL: repo URL] · working DMK demo (`HM_ADAPTER=dmk npx tsx demo/run.ts --compromised`) · captured device screens in `docs/proof/` (clear-sign of recipient on approve, attacker address on reject) · demo video: [FILL: demo video link] |
 | **Do you accept the Terms & Conditions?** | **Yes** |
 | **Repository URL** | [FILL: repo URL] |
 
@@ -87,7 +87,7 @@ Fill the official contest Google Form with the following. `[FILL: …]` = builde
 
 Maps to the contest requirements (spec §11). Check each before filing.
 
-- [ ] **Genuinely uses DMK and/or Wallet CLI, with proof.** Repo + signing-flow recording + CLI/Speculos screenshots. *(The Wallet CLI adapter is implemented; the Speculos device adapter currently uses Ledger's `hw-transport` stack. A genuine DMK adapter and the live recording are the remaining steps — see `docs/EMULATOR-TODO.md`. Report "Both" only once the DMK adapter is wired up.)*
+- [ ] **Genuinely uses DMK and/or Wallet CLI, with proof.** *(Met for tool use: the DMK adapter (`src/signing/dmk.ts`, on `@ledgerhq/device-management-kit`) is genuinely used and demonstrated on the Speculos emulator, and the Wallet CLI adapter (`src/signing/walletCli.ts`) is implemented for production — so the component answer is "Both." Proof: the public repo + the working DMK demo command + the captured device screens in `docs/proof/`. The walkthrough video is the remaining proof artifact — see `docs/EMULATOR-TODO.md`.)*
 - [ ] **Public post on X tagging @Ledger.** Post 1 and the close both tag @Ledger.
 - [ ] **Visible #LedgerSponsor disclosure in the post.** Present in post 1, unexpanded.
 - [ ] **One submission; builder is 18+ and not in an excluded territory.** Builder confirms.
@@ -96,11 +96,9 @@ Maps to the contest requirements (spec §11). Check each before filing.
 
 ### Remaining work before filing (from `docs/EMULATOR-TODO.md`)
 
-1. Stand up Speculos (`npm run speculos`) with the Ethereum app.
-2. Probe the Wallet CLI; run the signing spike / go-no-go; pick the working adapter.
-3. Restore full clear-signing so the device displays recipient + amount (or use the native testnet-ETH fallback).
-4. To report **Both** on the form: implement a genuine DMK adapter (`@ledgerhq/device-management-kit`) behind the `SigningAdapter` interface; otherwise report **Wallet CLI**.
-5. Fund the Base Sepolia account (faucet ETH + Circle testnet USDC).
-6. Live run: `HM_ADAPTER=speculos npx tsx demo/run.ts --compromised` — approve evt-001, reject the compromised tx, capture the tx hash.
-7. Record per `demo/record.md`; upload; fill the `[FILL: …]` links above.
-8. Publish the repo (`gh repo create harbormaster --public --source . --push`), post the thread, file the form.
+The emulator phase is done: Speculos is up (`npm run speculos`), the DMK adapter signs end-to-end on device, the demo clear-signs the recipient via native ETH, and device screens are captured in `docs/proof/`. What remains:
+
+1. **(Optional) Fund for a real broadcast.** Send Base Sepolia faucet ETH to the device address `0xDad77910DbDFdE764fC21FCD4E74D71bBACA6D8D` and run the demo without `HM_BROADCAST=0` to land a real on-chain tx and capture its hash. Signing is already demonstrated without this.
+2. **Record** the walkthrough per `demo/record.md` (Act 1 approve + Act 2 reject); upload; fill the `[FILL: …]` links above.
+3. **Publish** the repo (`gh repo create harbormaster --public --source . --push`).
+4. **Post** the thread and **file** the Google Form.
