@@ -2,7 +2,7 @@
 
 Pre-flight: `npm install`; Speculos running (`npm run speculos`); account funded; `.env` set with `HM_ADAPTER=speculos`.
 
-1. (0:00) Title card: "Harbormaster — an autonomous settlement agent that can't move funds without hardware approval."
+1. (0:00) Title card: "Harbormaster — an autonomous settlement agent that keeps the final authority to move funds in hardware."
 2. (0:08) Terminal: `npm run demo` (or `npx tsx demo/run.ts --compromised`).
 3. (0:15) ACT 1 — evt-001 prints APPROVED_FOR_REVIEW. Cut to the Speculos screen showing recipient 0x1111… + 2,500 USDC. Press Approve. Show the broadcast tx hash; open it on sepolia.basescan.org.
 4. (0:40) ACT 1 cont. — evt-002 and evt-003 print BLOCKED with reasons; note the deterministic policy layer refused to even build a tx.
