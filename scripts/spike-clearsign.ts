@@ -1,5 +1,5 @@
 // Phase 0: capture what the Ledger device screen shows for our USDC transfer.
-// Speculos must be running (apdu :9999, api :5000). Run: npx tsx scripts/spike-clearsign.ts
+// Speculos must be running (apdu :9999, api :5005). Run: npx tsx scripts/spike-clearsign.ts
 import SpeculosTransportImport from "@ledgerhq/hw-transport-node-speculos";
 import EthImport from "@ledgerhq/hw-app-eth";
 import { serializeTransaction, parseGwei } from "viem";
@@ -8,7 +8,7 @@ import type { SettlementIntent } from "../src/shared/types.js";
 
 const SpeculosTransport: any = (SpeculosTransportImport as any).default ?? SpeculosTransportImport;
 const Eth: any = (EthImport as any).default ?? EthImport;
-const API = "http://127.0.0.1:5000";
+const API = "http://127.0.0.1:5005";
 const DERIVATION = "44'/60'/0'/0/0";
 const USDC = "0x036CbD53842c5426634e7929541eC2318f3dCF7e" as const;
 

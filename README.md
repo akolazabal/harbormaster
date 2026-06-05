@@ -136,8 +136,8 @@ Harbormaster uses **both** components of the Ledger Agent Stack through one `Sig
 ## Status
 
 - **Software core: complete.** 41 tests passing; `tsc` clean. The full pipeline (watcher → policy → settler → audit) runs end-to-end.
-- **Emulator phase: done.** DMK signing is verified end-to-end on the Speculos emulator: the legitimate payout (evt-001) is signed on device, evt-002/003 are policy-blocked, and the compromised transfer is declined on-device. Captured device screens are in `docs/proof/`.
-- **Remaining:** fund the device address for a real on-chain broadcast (optional, signing is already demonstrated via `HM_BROADCAST=0`), record the walkthrough video, publish the repo, and post the thread. Tracked in **[docs/EMULATOR-TODO.md](docs/EMULATOR-TODO.md)**.
+- **Emulator phase: done.** DMK signing is verified end-to-end on the Speculos emulator: the legitimate payout (evt-001) is signed on device, evt-002/003 are policy-blocked, and the compromised transfer is declined on-device. Captured device screens are in `docs/proof/`, and a walkthrough video built from those frames is at `docs/harbormaster-demo.mp4`.
+- **Optional next step:** fund the device address for a real on-chain broadcast; signing is already demonstrated via `HM_BROADCAST=0`. Tracked in **[docs/EMULATOR-TODO.md](docs/EMULATOR-TODO.md)**.
 
 ## Repository layout
 

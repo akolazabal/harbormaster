@@ -8,6 +8,9 @@ dist/
 demo/audit.log.jsonl
 apps/
 
+# internal planning/spec artifacts (kept locally + in git history, not shipped in the repo)
+docs/superpowers/
+
 # iCloud Desktop conflict copies
 * 2.*
 * 2
