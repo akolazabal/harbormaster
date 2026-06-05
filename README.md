@@ -51,7 +51,7 @@ Four units. The first three are software; the fourth is the hardware root of tru
                                                           └──────────────────────┘
 ```
 
-A single `SigningAdapter` interface decouples the core from the signing transport, which is how the build uses **both** Ledger components and stays resilient: `mock` (no device, for tests and the dry run), `wallet-cli` (the Ledger Wallet CLI), and `speculos` (the Device Management Kit path over `@ledgerhq/hw-transport-node-speculos`). Pick one with the `HM_ADAPTER` env var.
+A single `SigningAdapter` interface decouples the core from the signing transport and keeps the build resilient: `mock` (no device, for tests and the dry run), `wallet-cli` (the Ledger Wallet CLI), and `speculos` (on-device signing against the Speculos emulator over `@ledgerhq/hw-transport-node-speculos`). Pick one with the `HM_ADAPTER` env var. The same interface makes a Device Management Kit adapter a drop-in (see [Built with the Ledger Agent Stack](#built-with-the-ledger-agent-stack)).
 
 Full detail in **[docs/ARCHITECTURE.md](docs/ARCHITECTURE.md)**. The reasoning behind the layered design is in **[docs/THESIS.md](docs/THESIS.md)**.
 
@@ -117,10 +117,12 @@ This is a technical illustration of a safety property — *here is the layered d
 
 ## Built with the Ledger Agent Stack
 
-Harbormaster uses **both** components of the Ledger Agent Stack:
+Harbormaster targets **both** components of the Ledger Agent Stack through one `SigningAdapter` interface:
 
-- **Ledger Wallet CLI** — the `wallet-cli` signing adapter (`src/signing/walletCli.ts`): the agentic entry point that shells out to the CLI and parses its result.
-- **Device Management Kit (DMK)** — the Speculos signing adapter (`src/signing/speculos.ts`): the in-process clear-signing approval gate over `@ledgerhq/hw-transport-node-speculos`.
+- **Ledger Wallet CLI** — the `wallet-cli` signing adapter (`src/signing/walletCli.ts`): the agentic entry point that shells out to the CLI and parses its JSON result. *Implemented.*
+- **Device Management Kit (DMK)** — an in-process clear-signing approval gate. *In progress:* the current device adapter (`src/signing/speculos.ts`) signs against the Speculos emulator via Ledger's `@ledgerhq/hw-transport-node-speculos` stack; the dedicated DMK (`@ledgerhq/device-management-kit`) adapter is part of the emulator-phase bring-up and drops into the same interface — see [docs/EMULATOR-TODO.md](docs/EMULATOR-TODO.md).
+
+> Note for the contest form: report **"Both"** only once the DMK adapter is genuinely wired up; until then the honest answer is **"Wallet CLI."** Accuracy here matters — the contest verifies tool use.
 
 ## Status
 

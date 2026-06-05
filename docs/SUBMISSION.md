@@ -74,7 +74,7 @@ Fill the official contest Google Form with the following. `[FILL: …]` = builde
 | **University & blockchain club** | [FILL: university & blockchain club] |
 | **X handle** | [FILL: X handle] |
 | **Link to your post** | [FILL: X post URL] |
-| **Which component did you use?** | **Both** (Device Management Kit + Ledger Wallet CLI) |
+| **Which component did you use?** | **Wallet CLI** as built today; report **Both** (DMK + Wallet CLI) only once the DMK adapter is genuinely wired up (emulator phase). Choose whichever is true at submission time — the contest verifies tool use. |
 | **Proof of use** | Public repo: [FILL: repo URL] · signing-flow screenshots (terminal policy decisions + Speculos clear-sign screen + Base Sepolia tx) · demo video: [FILL: demo video link] |
 | **Do you accept the Terms & Conditions?** | **Yes** |
 | **Repository URL** | [FILL: repo URL] |
@@ -87,7 +87,7 @@ Fill the official contest Google Form with the following. `[FILL: …]` = builde
 
 Maps to the contest requirements (spec §11). Check each before filing.
 
-- [ ] **Genuinely uses DMK and/or Wallet CLI, with proof.** Repo + signing-flow recording + CLI/Speculos screenshots. *(Both adapters are implemented; the live recording is the remaining step — see `docs/EMULATOR-TODO.md`.)*
+- [ ] **Genuinely uses DMK and/or Wallet CLI, with proof.** Repo + signing-flow recording + CLI/Speculos screenshots. *(The Wallet CLI adapter is implemented; the Speculos device adapter currently uses Ledger's `hw-transport` stack. A genuine DMK adapter and the live recording are the remaining steps — see `docs/EMULATOR-TODO.md`. Report "Both" only once the DMK adapter is wired up.)*
 - [ ] **Public post on X tagging @Ledger.** Post 1 and the close both tag @Ledger.
 - [ ] **Visible #LedgerSponsor disclosure in the post.** Present in post 1, unexpanded.
 - [ ] **One submission; builder is 18+ and not in an excluded territory.** Builder confirms.
@@ -99,7 +99,8 @@ Maps to the contest requirements (spec §11). Check each before filing.
 1. Stand up Speculos (`npm run speculos`) with the Ethereum app.
 2. Probe the Wallet CLI; run the signing spike / go-no-go; pick the working adapter.
 3. Restore full clear-signing so the device displays recipient + amount (or use the native testnet-ETH fallback).
-4. Fund the Base Sepolia account (faucet ETH + Circle testnet USDC).
-5. Live run: `HM_ADAPTER=speculos npx tsx demo/run.ts --compromised` — approve evt-001, reject the compromised tx, capture the tx hash.
-6. Record per `demo/record.md`; upload; fill the `[FILL: …]` links above.
-7. Publish the repo (`gh repo create harbormaster --public --source . --push`), post the thread, file the form.
+4. To report **Both** on the form: implement a genuine DMK adapter (`@ledgerhq/device-management-kit`) behind the `SigningAdapter` interface; otherwise report **Wallet CLI**.
+5. Fund the Base Sepolia account (faucet ETH + Circle testnet USDC).
+6. Live run: `HM_ADAPTER=speculos npx tsx demo/run.ts --compromised` — approve evt-001, reject the compromised tx, capture the tx hash.
+7. Record per `demo/record.md`; upload; fill the `[FILL: …]` links above.
+8. Publish the repo (`gh repo create harbormaster --public --source . --push`), post the thread, file the form.

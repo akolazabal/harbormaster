@@ -16,6 +16,7 @@ The software core is complete: **35 tests passing, `tsc` clean**, full pipeline 
 7. **Funding** — confirm the Base Sepolia testnet USDC contract; fund the derived account with faucet ETH (gas) + testnet USDC. (Plan Task 0.4.)
 8. **Live run** — `HM_ADAPTER=speculos npx tsx demo/run.ts --compromised`; approve evt-001, reject the compromised tx; capture the real tx hash on sepolia.basescan.org.
 9. **Record** — per `demo/record.md`.
+10. **(To report "Both" on the form) Genuine DMK adapter** — implement a `dmk` adapter on `@ledgerhq/device-management-kit` (+ its ETH signer + a node/Speculos transport) behind the existing `SigningAdapter` interface. Can be built independently of the steps above. Until this is done and run, the honest contest component answer is **"Wallet CLI"** — the current `speculos.ts` adapter uses Ledger's `hw-transport`/`hw-app-eth` stack, which is not the DMK package.
 
 ## Note
 None of the above changes the deterministic core (policy/watcher/settler/audit), which is done and tested. This is purely the hardware-signing seam + recording.
