@@ -20,7 +20,7 @@ There are three lanes; we are building **Lane C — "Build Something Real"** (an
 **What winning looks like:**
 1. A genuinely working build that uses the Ledger Agent Stack (DMK + Wallet CLI) for real, hardware-signed transactions.
 2. A demo that makes the thesis *undeniable* in 90 seconds (the "kill switch" moment).
-3. A clean public repo + README + a short, opinionated X thread tagging **@Ledger** with a **#LedgerSponsor** disclosure.
+3. A clean public repo + README + a short, measured (builder-voice, not fear-based) X thread tagging **@Ledger** with a **#LedgerSponsor** disclosure.
 4. All contest requirements satisfied (see §11 qualification checklist).
 
 ---
@@ -155,7 +155,7 @@ A `demo/` runner streams a scripted set of events through the full pipeline. Two
 - **Layer 1 (deterministic):** the Policy Engine blocks it — attacker address not on allowlist / on denylist / exceeds cap. The LLM's compromised "intent" never becomes a tx.
 - **Layer 2 (the kicker):** we deliberately simulate a *fully compromised* agent that bypassed the software layer and assembled the malicious tx anyway → the **Ledger device screen shows `0xATTACKER`** and the real amount → human **Rejects** → nothing moves.
 
-**The line for the post:** *Software guardrails can be talked out of. The hardware can't. Even a fully compromised agent can't beat the device.*
+**The framing (founder-safe, constructive — see §8.1).** The public story is *how to ship agentic payments responsibly*, not *agents are dangerous*. We **demonstrate** the safety property and let it speak; we do not fear-monger about agents or make absolute claims. Public line, measured: *"Give the agent the work, keep the final authority in hardware. Deterministic policy + a Ledger device is the safety primitive that makes hands-off settlement something you can actually deploy."*
 
 ---
 
@@ -196,6 +196,14 @@ harbormaster/
 2. **60–90s demo recording** — Acts 1 & 2. Shipped with an **automated demo runner + recording script** (`demo/record.md`) so capture is trivial. Builder records the final video.
 3. **X thread draft** — builder's voice, tags **@Ledger**, includes **#LedgerSponsor** disclosure, links repo + video.
 4. **Pre-filled Google Form answers** — component = **Both**; proof = repo link + CLI/signing screenshots + video; T&C = Yes; X handle.
+
+### 8.1 Voice & framing constraints (applies to README, THESIS.md, X thread, captions)
+The author is the founder of [[Tide]], a company building agentic stablecoin settlement. The public narrative must therefore be **constructive, measured, and builder-forward**:
+- **Frame it as enablement, not warning.** Hardware authority is what *lets you deploy* autonomous settlement — not a reason to distrust agents. Positive thesis: "responsible autonomy."
+- **Demonstrate, don't proclaim.** Show the guardrail working; avoid slogans like "agents will steal your money" or "software can always be talked out of."
+- **No absolute security claims.** Never "unhackable," "can't be beaten," "100% safe." Use bounded language: "the final authority lives in hardware," "a deterministic policy layer plus on-device confirmation."
+- **THESIS.md tone:** measured and informative — explain the layered design (quarantine → deterministic policy → on-device confirmation) and *why hardware is the right place for final authority*. No hype, no fear, no investment/financial claims.
+- **Attack demo is a technical illustration**, framed as "here is the safety property, verified," not as a verdict on agents in general.
 
 ---
 
