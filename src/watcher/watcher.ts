@@ -4,7 +4,7 @@ import type { SettlementIntent, Milestone } from "../shared/types.js";
 
 export class InvalidEventError extends Error {}
 
-export function parseEvent(raw: string): SettlementIntent {
+export function parseEvent(raw: string, asset: SettlementIntent["asset"] = "USDC"): SettlementIntent {
   let obj: Record<string, unknown>;
   try {
     obj = JSON.parse(raw);
@@ -23,7 +23,7 @@ export function parseEvent(raw: string): SettlementIntent {
     milestone: str(obj.milestone, "milestone") as Milestone,
     counterpartyName: str(obj.counterpartyName, "counterpartyName"),
     counterpartyAddress: counterpartyAddress as `0x${string}`,
-    asset: "USDC", // hardcoded: untrusted input cannot choose the asset
+    asset, // set by caller; untrusted input cannot choose the asset
     chain: "base-sepolia", // hardcoded: untrusted input cannot choose the chain
     amount: str(obj.amount, "amount"),
     sourceEventRaw: raw, // retain full untrusted original for audit
@@ -38,9 +38,9 @@ function str(v: unknown, field: string): string {
   return v;
 }
 
-export function loadEvents(dir: string): SettlementIntent[] {
+export function loadEvents(dir: string, asset: SettlementIntent["asset"] = "USDC"): SettlementIntent[] {
   return readdirSync(dir)
     .filter((f) => f.endsWith(".json"))
     .sort()
-    .map((f) => parseEvent(readFileSync(join(dir, f), "utf8")));
+    .map((f) => parseEvent(readFileSync(join(dir, f), "utf8"), asset));
 }

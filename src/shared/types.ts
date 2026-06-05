@@ -6,7 +6,7 @@ export type SettlementIntent = {
   milestone: Milestone;
   counterpartyName: string;
   counterpartyAddress: `0x${string}`;
-  asset: "USDC";
+  asset: "USDC" | "ETH";
   chain: "base-sepolia";
   amount: string; // decimal USDC, e.g. "2500.00"
   sourceEventRaw: string; // untrusted original, retained for audit
@@ -29,7 +29,7 @@ export type PolicyConfig = {
   perTxCapUsdc: number;
   dailyCapUsdc: number;
   allowedChains: ["base-sepolia"];
-  allowedAssets: ["USDC"];
+  allowedAssets: ("USDC" | "ETH")[];
 };
 
 export type DayState = { date: string; spentUsdc: number };
