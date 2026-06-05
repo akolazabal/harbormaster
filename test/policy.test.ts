@@ -58,6 +58,16 @@ test("blocks non-whitelisted chain", () => {
   expect(d.reasons).toContain("chain_whitelist");
 });
 
+test("blocks non-whitelisted asset", () => {
+  const d = evaluate(intent({ asset: "WETH" as any }), config, day);
+  expect(d.reasons).toContain("asset_whitelist");
+});
+
+test("blocks invalid milestone", () => {
+  const d = evaluate(intent({ milestone: "PAYDAY" as any }), config, day);
+  expect(d.reasons).toContain("milestone_valid");
+});
+
 test("every decision includes a full check trace", () => {
   const d = evaluate(intent(), config, day);
   const names = d.checks.map((c) => c.name);
