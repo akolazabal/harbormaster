@@ -1,0 +1,8 @@
+{
+  "id": "evt-001",
+  "shipmentId": "TIDE-SHP-4471",
+  "milestone": "DELIVERY",
+  "counterpartyName": "Caspian Freight LLP",
+  "counterpartyAddress": "0x1111111111111111111111111111111111111111",
+  "amount": "2500.00"
+}
