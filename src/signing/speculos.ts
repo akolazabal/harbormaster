@@ -1,5 +1,5 @@
 import SpeculosTransport from "@ledgerhq/hw-transport-node-speculos";
-import Eth, { ledgerService } from "@ledgerhq/hw-app-eth";
+import Eth from "@ledgerhq/hw-app-eth";
 import type { SpeculosTransportOpts } from "@ledgerhq/hw-transport-node-speculos";
 import { createPublicClient, http, serializeTransaction, parseGwei } from "viem";
 import { baseSepolia } from "viem/chains";
@@ -60,7 +60,16 @@ export function speculosAdapter(opts: { rpcUrl: string; apduPort?: number }): Si
           chainId: tx.chainId, type: "eip1559" as const,
         };
         const serialized = serializeTransaction(unsigned); // 0x-prefixed, unsigned
-        const resolution = await ledgerService.resolveTransaction(serialized.slice(2), {}, {});
+        // ledgerService is not available in all installed versions; load lazily and fall back to null resolution
+        let resolution: unknown = null;
+        try {
+          const { ledgerService } = await import("@ledgerhq/hw-app-eth") as any;
+          if (ledgerService?.resolveTransaction) {
+            resolution = await ledgerService.resolveTransaction(serialized.slice(2), {}, {});
+          }
+        } catch {
+          // older hw-app-eth without ledgerService — proceed with null resolution
+        }
         const sig = await eth.signTransaction(DERIVATION, serialized.slice(2), resolution); // device prompts here
 
         const signed = serializeTransaction(unsigned, {
