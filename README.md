@@ -7,6 +7,12 @@
 
 ---
 
+## Demo
+
+**Watch the 48-second walkthrough: [docs/harbormaster-demo.mp4](docs/harbormaster-demo.mp4)** (plays on its GitHub file page).
+
+Built from the real Speculos device frames: a legitimate payout signed on the device, the policy-blocked events that never reach it, and a compromised transfer declined on-device. The captured device screens are in [docs/proof/](docs/proof/).
+
 ## The problem
 
 I'm building [Tide](#about), an AI-native freight forwarder that settles cross-border trade in stablecoins. An agent that moves real money needs a final authority that can't be talked out of and can't be copied. A private key in a `.env` is a single, copyable secret: anything that can read the process, a prompt injection in an inbound document, a poisoned tool result, a leaked file, can spend it. The question that gates deploying autonomous settlement isn't "is the agent smart enough?" It's "where does the authority to *actually move funds* live, and who holds it?"
