@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Harbormaster — Ledger device (Speculos)</title>
+  <style>
+    body { background:#0b0b0d; color:#e9e4d8; font-family:ui-sans-serif,system-ui,sans-serif; text-align:center; padding:32px; }
+    h1 { font-weight:600; font-size:18px; color:#c8a55a; letter-spacing:.3px; }
+    p  { color:#8a8578; font-size:13px; }
+    .screen { display:inline-block; margin:18px auto; padding:16px; background:#000; border:2px solid #2a2520; border-radius:10px; }
+    img { image-rendering:pixelated; width:512px; height:auto; display:block; background:#000; }
+    code { color:#c8a55a; }
+  </style>
+</head>
+<body>
+  <h1>⚓ Harbormaster — Ledger device (Speculos)</h1>
+  <div class="screen"><img id="s" alt="device screen" /></div>
+  <p>Live view of the on-device review. Run the demo in a terminal:
+     <code>HM_ADAPTER=dmk npx tsx demo/run.ts --compromised</code></p>
+  <script>
+    const API = "http://127.0.0.1:5005";
+    const img = document.getElementById("s");
+    setInterval(() => { img.src = API + "/screenshot?t=" + Date.now(); }, 150);
+  </script>
+</body>
+</html>
