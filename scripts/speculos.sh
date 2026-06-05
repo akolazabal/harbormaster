@@ -13,7 +13,7 @@ if [ ! -f "$ELF" ]; then
   echo "Downloading Ethereum app ELF ($APP_VERSION, nanos2)…"
   curl -fsSL -o "$ELF" "https://github.com/LedgerHQ/app-ethereum/releases/download/${APP_VERSION}/app-${APP_VERSION}-nanos2.elf"
 fi
-echo "Starting Speculos — API http://127.0.0.1:5005 · APDU 127.0.0.1:9999 (Ctrl-C to stop)"
+echo "Starting Speculos - API http://127.0.0.1:5005 · APDU 127.0.0.1:9999 (Ctrl-C to stop)"
 docker rm -f speculos >/dev/null 2>&1 || true
 exec docker run --rm --name speculos --platform linux/amd64 \
   -p 5005:5000 -p 9999:9999 \

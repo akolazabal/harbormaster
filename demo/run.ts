@@ -12,7 +12,7 @@ import type { AuditRecord, DayState } from "../src/shared/types.js";
 const AUDIT = "demo/audit.log.jsonl";
 
 async function main() {
-  // Demo policy: native-ETH settlement with ETH-scale caps. (Production config is config/policy.json — USDC.)
+  // Demo policy: native-ETH settlement with ETH-scale caps. (Production config is config/policy.json - USDC.)
   const config = loadPolicyConfig("config/policy.demo.json");
   const env = loadEnv();
   const adapter = selectAdapter();
@@ -23,11 +23,11 @@ async function main() {
   let day: DayState = { date: new Date().toISOString().slice(0, 10), spentUsdc: 0 };
   let prev: AuditRecord | null = null;
 
-  console.log(`\n⚓ Harbormaster — adapter=${adapter.name} chain=base-sepolia${process.env.HM_BROADCAST === "0" ? " (sign-only)" : ""}\n`);
+  console.log(`\n⚓ Harbormaster - adapter=${adapter.name} chain=base-sepolia${process.env.HM_BROADCAST === "0" ? " (sign-only)" : ""}\n`);
 
   // ACT 1 + normal pipeline: each event flows watcher → policy → (device) → audit
   for (const intent of intents) {
-    console.log(`— event ${intent.id} → ${intent.counterpartyName} ${intent.amount} ${intent.asset}`);
+    console.log(`- event ${intent.id} → ${intent.counterpartyName} ${intent.amount} ${intent.asset}`);
     let driver: Promise<boolean> | null = null;
     if (useDevice && evaluate(intent, config, day).decision === "APPROVED_FOR_REVIEW") {
       await clearEvents();
@@ -42,7 +42,7 @@ async function main() {
     console.log(`   policy=${r.policy.decision}${r.policy.reasons.length ? " [" + r.policy.reasons.join(",") + "]" : ""} → signing=${r.signing.status}${r.signing.txHash ? " " + r.signing.txHash : ""}\n`);
   }
 
-  // ACT 2 / Layer 2 — simulate a COMPROMISED agent that bypasses the policy layer
+  // ACT 2 / Layer 2 - simulate a COMPROMISED agent that bypasses the policy layer
   // and assembles a malicious tx directly. The device is the last line of defense.
   if (process.argv.includes("--compromised")) {
     console.log("\n‼️  Simulating a compromised agent: bypassing policy, sending straight to the device…");
@@ -60,7 +60,7 @@ async function main() {
     appendAudit(AUDIT, record);
 
     if (result.status === "REJECTED") {
-      console.log(`   device verdict = REJECTED. The hardware held the final authority — the attacker address never received funds.\n`);
+      console.log(`   device verdict = REJECTED. The hardware held the final authority - the attacker address never received funds.\n`);
     } else {
       console.log(`   device verdict = APPROVED. Note: this ran without a human in the loop (${adapter.name} / no-device mode). With a real Ledger device, a human reviewing the recipient address on screen is the control that stops this payout.\n`);
     }

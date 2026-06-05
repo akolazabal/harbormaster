@@ -72,7 +72,7 @@ export function speculosAdapter(opts: { rpcUrl: string; apduPort?: number }): Si
               resolution = await ledgerService.resolveTransaction(serialized.slice(2), {}, {});
             }
           } catch {
-            // older hw-app-eth without ledgerService — proceed with null resolution
+            // older hw-app-eth without ledgerService - proceed with null resolution
           }
         }
         const sig = await eth.signTransaction(DERIVATION, serialized.slice(2), resolution); // device prompts here

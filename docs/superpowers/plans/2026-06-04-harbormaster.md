@@ -4,7 +4,7 @@
 
 **Goal:** Build an autonomous "Tide-style" stablecoin settlement agent whose every payout is gated by a deterministic policy engine **and** a hardware approval on a Ledger device (Speculos emulator), demonstrated by a two-act demo (legit settlement + caught attack).
 
-**Architecture:** Four units with a quarantine boundary — Watcher (read-only, untrusted input) → Policy Engine (deterministic, pure) → Settler (privileged: assemble tx, audit) → Ledger device (Speculos: Clear-Sign + Approve/Reject). A `SigningAdapter` interface decouples the core from the signing transport, enabling "Both" (DMK + Wallet CLI) and a 3-tier emulator fallback.
+**Architecture:** Four units with a quarantine boundary - Watcher (read-only, untrusted input) → Policy Engine (deterministic, pure) → Settler (privileged: assemble tx, audit) → Ledger device (Speculos: Clear-Sign + Approve/Reject). A `SigningAdapter` interface decouples the core from the signing transport, enabling "Both" (DMK + Wallet CLI) and a 3-tier emulator fallback.
 
 **Tech Stack:** Node.js + TypeScript (ESM/NodeNext), viem (EVM tx assembly + broadcast), Vitest (tests), Speculos in Docker (Ethereum app), `@ledgerhq/wallet-cli` + agent-skills, `@ledgerhq/hw-transport-node-speculos` (guaranteed fallback). Chain: Base Sepolia, testnet USDC.
 
@@ -41,7 +41,7 @@
 
 ---
 
-## PHASE 0 — Scaffold + de-risk spike (do FIRST, solo, sequential)
+## PHASE 0 - Scaffold + de-risk spike (do FIRST, solo, sequential)
 
 > Phase 0 is exploratory: it discovers the exact signing transport. Do **not** fan out subagents until Task 0.5's go/no-go passes. Everything downstream depends only on the `SigningAdapter` interface, so the rest of the plan is transport-agnostic.
 
@@ -163,7 +163,7 @@ Expected: capture subcommands and, critically, **any transport/emulator flag or 
 
 ```bash
 git add docs/PHASE0-NOTES.md
-git commit -m "docs: Phase 0 notes — Ledger CLI surface + skills installed"
+git commit -m "docs: Phase 0 notes - Ledger CLI surface + skills installed"
 ```
 
 ### Task 0.3: Stand up Speculos (Ethereum app)
@@ -223,7 +223,7 @@ Get Base Sepolia ETH (gas) from a Base Sepolia faucet and testnet USDC from Circ
 Run: `wallet-cli balances <label> --format json`
 Expected: non-zero ETH and USDC. Commit notes.
 
-### Task 0.5: SIGNING SPIKE — sign one Base Sepolia USDC transfer end-to-end (GO/NO-GO)
+### Task 0.5: SIGNING SPIKE - sign one Base Sepolia USDC transfer end-to-end (GO/NO-GO)
 
 **Files:** `docs/PHASE0-NOTES.md` (decision record).
 
@@ -259,9 +259,9 @@ git commit -m "spike: confirm Speculos signing transport + go/no-go"
 
 ---
 
-## PHASE 1 — Deterministic core (TDD; parallelizable after Phase 0)
+## PHASE 1 - Deterministic core (TDD; parallelizable after Phase 0)
 
-> Tasks 1–8 have no device dependency and can be fanned out to subagents. They share only `src/shared/types.ts` (Task 1), so build Task 1 first, then parallelize 2–8.
+> Tasks 1-8 have no device dependency and can be fanned out to subagents. They share only `src/shared/types.ts` (Task 1), so build Task 1 first, then parallelize 2-8.
 
 ### Task 1: Shared types
 
@@ -947,7 +947,7 @@ export function buildUsdcTransfer(intent: SettlementIntent, usdcContract: `0x${s
 
 ---
 
-## PHASE 2 — Signing adapters + settler orchestration
+## PHASE 2 - Signing adapters + settler orchestration
 
 ### Task 9: SigningAdapter interface + mock
 
@@ -1083,13 +1083,13 @@ export async function settleOne(
 - [ ] **Step 4: Run** → Expected: PASS.
 - [ ] **Step 5: Commit** `git add src/settler/settler.ts test/settler.test.ts && git commit -m "feat: settler orchestration"`
 
-### Task 11: Real signing adapters (wallet-cli + speculos) — built from Phase 0 findings
+### Task 11: Real signing adapters (wallet-cli + speculos) - built from Phase 0 findings
 
 > Implement the adapter(s) confirmed working in Task 0.5. Build at least the one that passed GO. The `speculos.ts` reference below uses the guaranteed `hw-transport-node-speculos` path; if Task 0.5 confirmed the Wallet CLI drives Speculos, prioritize `walletCli.ts`. (For "Both" in the submission, ship both.)
 
 **Files:**
 - Create: `src/signing/walletCli.ts`, `src/signing/speculos.ts`, `src/signing/select.ts`
-- Test: `test/walletCli.test.ts` (uses a stub binary — deterministic, no device)
+- Test: `test/walletCli.test.ts` (uses a stub binary - deterministic, no device)
 
 - [ ] **Step 1: Write `src/signing/walletCli.ts`**
 
@@ -1224,13 +1224,13 @@ export function selectAdapter(): SigningAdapter {
 }
 ```
 
-- [ ] **Step 6: Manual integration check** — with Speculos running and `HM_ADAPTER=speculos` (or `wallet-cli`), run a one-off settle (covered by the demo in Task 13). Confirm a real Base Sepolia tx hash on a block explorer. Record in `docs/PHASE0-NOTES.md`.
+- [ ] **Step 6: Manual integration check** - with Speculos running and `HM_ADAPTER=speculos` (or `wallet-cli`), run a one-off settle (covered by the demo in Task 13). Confirm a real Base Sepolia tx hash on a block explorer. Record in `docs/PHASE0-NOTES.md`.
 
 - [ ] **Step 7: Commit** `git add src/signing/ test/walletCli.test.ts && git commit -m "feat: wallet-cli + speculos signing adapters"`
 
 ---
 
-## PHASE 3 — Demo, packaging, submission
+## PHASE 3 - Demo, packaging, submission
 
 ### Task 12: Demo event fixtures
 
@@ -1307,11 +1307,11 @@ async function main() {
   let day: DayState = { date: new Date().toISOString().slice(0, 10), spentUsdc: 0 };
   let prev: AuditRecord | null = null;
 
-  console.log(`\n⚓ Harbormaster — adapter=${adapter.name} chain=base-sepolia\n`);
+  console.log(`\n⚓ Harbormaster - adapter=${adapter.name} chain=base-sepolia\n`);
 
   // ACT 1 + normal pipeline: each event flows watcher → policy → (device) → audit
   for (const intent of intents) {
-    console.log(`— event ${intent.id} → ${intent.counterpartyName} ${intent.amount} USDC`);
+    console.log(`- event ${intent.id} → ${intent.counterpartyName} ${intent.amount} USDC`);
     const { record, day: d2 } = await settleOne(intent, { config, usdcContract: env.usdcContract, adapter }, day, prev);
     day = d2;
     prev = record;
@@ -1320,7 +1320,7 @@ async function main() {
     console.log(`   policy=${r.policy.decision}${r.policy.reasons.length ? " [" + r.policy.reasons.join(",") + "]" : ""} → signing=${r.signing.status}${r.signing.txHash ? " " + r.signing.txHash : ""}\n`);
   }
 
-  // ACT 2 / Layer 2 — simulate a COMPROMISED agent that bypasses the policy layer
+  // ACT 2 / Layer 2 - simulate a COMPROMISED agent that bypasses the policy layer
   // and assembles a malicious tx directly. The device is the last line of defense.
   if (process.argv.includes("--compromised")) {
     console.log("\n‼️  Simulating a compromised agent: bypassing policy, sending straight to the device…");
@@ -1354,18 +1354,18 @@ Expected: evt-001 broadcasts a real Base Sepolia tx hash; compromised tx → REJ
 **Files:**
 - Create: `demo/record.md`
 
-- [ ] **Step 1: Write `demo/record.md`** — a shot list:
+- [ ] **Step 1: Write `demo/record.md`** - a shot list:
 
 ```markdown
-# Recording the Harbormaster demo (target: 75–90s)
+# Recording the Harbormaster demo (target: 75-90s)
 
 Pre-flight: `npm install`; Speculos running (`npm run speculos`); account funded; `.env` set with `HM_ADAPTER=speculos`.
 
-1. (0:00) Title card: "Harbormaster — an autonomous settlement agent that can't move funds without hardware approval."
+1. (0:00) Title card: "Harbormaster - an autonomous settlement agent that can't move funds without hardware approval."
 2. (0:08) Terminal: `npm run demo` (or `npx tsx demo/run.ts --compromised`).
-3. (0:15) ACT 1 — evt-001 prints APPROVED_FOR_REVIEW. Cut to the Speculos screen showing recipient 0x1111… + 2,500 USDC. Press Approve. Show the broadcast tx hash; open it on sepolia.basescan.org.
-4. (0:40) ACT 1 cont. — evt-002 and evt-003 print BLOCKED with reasons; note the deterministic policy layer refused to even build a tx.
-5. (0:55) ACT 2 — "What if the agent itself is compromised?" The runner bypasses policy and sends the attacker tx straight to the device. The Speculos screen shows 0x000…dEaD. Press Reject.
+3. (0:15) ACT 1 - evt-001 prints APPROVED_FOR_REVIEW. Cut to the Speculos screen showing recipient 0x1111… + 2,500 USDC. Press Approve. Show the broadcast tx hash; open it on sepolia.basescan.org.
+4. (0:40) ACT 1 cont. - evt-002 and evt-003 print BLOCKED with reasons; note the deterministic policy layer refused to even build a tx.
+5. (0:55) ACT 2 - "What if the agent itself is compromised?" The runner bypasses policy and sends the attacker tx straight to the device. The Speculos screen shows 0x000…dEaD. Press Reject.
 6. (1:10) Close on the line: "Give the agent the work. Keep the final authority in hardware."
 ```
 
@@ -1378,9 +1378,9 @@ Pre-flight: `npm install`; Speculos running (`npm run speculos`); account funded
 
 > Apply spec §8.1 voice: constructive, measured, builder-forward; no absolute security claims; demonstrate don't proclaim.
 
-- [ ] **Step 1: Write `README.md`** — sections: one-line pitch; the problem (agentic settlement needs a final authority that isn't a copyable key); what Harbormaster does; architecture diagram (ASCII from spec §4); **Quickstart** (`npm install`, `npm run speculos`, fund, `npm run demo`); the two-act walkthrough; "Built with the Ledger Agent Stack (DMK + Wallet CLI)"; link to ARCHITECTURE + THESIS; #LedgerSponsor note.
-- [ ] **Step 2: Write `docs/ARCHITECTURE.md`** — the 4 units, the quarantine boundary, the SigningAdapter abstraction + 3-tier transport, the hash-chained audit log, data types from spec §5.
-- [ ] **Step 3: Write `docs/THESIS.md`** — measured essay: why a deterministic policy layer + on-device confirmation is the right shape for autonomous settlement; map to layered defense; explicitly bounded claims; no investment/financial advice.
+- [ ] **Step 1: Write `README.md`** - sections: one-line pitch; the problem (agentic settlement needs a final authority that isn't a copyable key); what Harbormaster does; architecture diagram (ASCII from spec §4); **Quickstart** (`npm install`, `npm run speculos`, fund, `npm run demo`); the two-act walkthrough; "Built with the Ledger Agent Stack (DMK + Wallet CLI)"; link to ARCHITECTURE + THESIS; #LedgerSponsor note.
+- [ ] **Step 2: Write `docs/ARCHITECTURE.md`** - the 4 units, the quarantine boundary, the SigningAdapter abstraction + 3-tier transport, the hash-chained audit log, data types from spec §5.
+- [ ] **Step 3: Write `docs/THESIS.md`** - measured essay: why a deterministic policy layer + on-device confirmation is the right shape for autonomous settlement; map to layered defense; explicitly bounded claims; no investment/financial advice.
 - [ ] **Step 4: Run** `npx tsc --noEmit && npx vitest run` → Expected: clean typecheck + all tests pass.
 - [ ] **Step 5: Commit** `git add README.md docs/ARCHITECTURE.md docs/THESIS.md && git commit -m "docs: README, architecture, thesis (measured)"`
 
@@ -1390,7 +1390,7 @@ Pre-flight: `npm install`; Speculos running (`npm run speculos`); account funded
 - Create: `docs/SUBMISSION.md`
 
 - [ ] **Step 1: Write `docs/SUBMISSION.md`** containing:
-  - **X thread** (5–7 posts, builder voice): hook → the problem → what you built (Harbormaster) → the 2-act demo (with the video) → "built with @Ledger DMK + Wallet CLI" → repo link → **#LedgerSponsor** disclosure visible in the first post. Includes the measured close line.
+  - **X thread** (5-7 posts, builder voice): hook → the problem → what you built (Harbormaster) → the 2-act demo (with the video) → "built with @Ledger DMK + Wallet CLI" → repo link → **#LedgerSponsor** disclosure visible in the first post. Includes the measured close line.
   - **Form answers**: Full Name; Email; University & Blockchain club; Link of post; Component = **Both**; Proof = repo URL + signing-flow screenshots + video link; T&Cs = **Yes**; Repo URL; X handle.
   - A pre-submission **qualification checklist** (spec §11).
 - [ ] **Step 2: Commit** `git add docs/SUBMISSION.md && git commit -m "docs: X thread draft + Google Form answers"`
@@ -1406,8 +1406,8 @@ Pre-flight: `npm install`; Speculos running (`npm run speculos`); account funded
 
 ## Self-Review
 
-**Spec coverage:** §2 idea → Tasks 6–13; §4 architecture (4 units + quarantine) → Watcher (6), Policy (4), Settler (10), Signing/device (9,11); §5 data model → Task 1; §6 demo (Act 1 + kill switch) → Tasks 12–14; §7 stack/repo → Task 0.1 + file structure; §8 deliverables → Tasks 15–17; §8.1 voice → enforced in Tasks 15–16; §9 build approach → phase structure; §10 Phase 0 spike → Tasks 0.1–0.5; §11 qualification → Task 16/17; §12 YAGNI → respected (no multisig/mainnet/x402/UI); §13 risks → 3-tier adapter (9/11) + mock path. No gaps.
+**Spec coverage:** §2 idea → Tasks 6-13; §4 architecture (4 units + quarantine) → Watcher (6), Policy (4), Settler (10), Signing/device (9,11); §5 data model → Task 1; §6 demo (Act 1 + kill switch) → Tasks 12-14; §7 stack/repo → Task 0.1 + file structure; §8 deliverables → Tasks 15-17; §8.1 voice → enforced in Tasks 15-16; §9 build approach → phase structure; §10 Phase 0 spike → Tasks 0.1-0.5; §11 qualification → Task 16/17; §12 YAGNI → respected (no multisig/mainnet/x402/UI); §13 risks → 3-tier adapter (9/11) + mock path. No gaps.
 
-**Placeholder scan:** All code steps contain real code. The only deferred specifics are external API exactness (wallet-cli JSON shape, hw-app-eth version) — these are explicitly resolved in the Task 0.5 spike and the adapters ship a concrete reference implementation, not a placeholder.
+**Placeholder scan:** All code steps contain real code. The only deferred specifics are external API exactness (wallet-cli JSON shape, hw-app-eth version) - these are explicitly resolved in the Task 0.5 spike and the adapters ship a concrete reference implementation, not a placeholder.
 
-**Type consistency:** `SettlementIntent`, `PolicyDecision`, `PolicyConfig`, `DayState`, `UnsignedTx`, `SigningResult`, `AuditRecord` are defined once in Task 1 and used verbatim in Tasks 4–13. `evaluate()`, `settleOne()`, `buildUsdcTransfer()`, `buildRecord()`, `verifyChain()`, `signAndBroadcast()` signatures match across definition and call sites. `selectAdapter()` returns the `SigningAdapter` interface used by `settleOne`.
+**Type consistency:** `SettlementIntent`, `PolicyDecision`, `PolicyConfig`, `DayState`, `UnsignedTx`, `SigningResult`, `AuditRecord` are defined once in Task 1 and used verbatim in Tasks 4-13. `evaluate()`, `settleOne()`, `buildUsdcTransfer()`, `buildRecord()`, `verifyChain()`, `signAndBroadcast()` signatures match across definition and call sites. `selectAdapter()` returns the `SigningAdapter` interface used by `settleOne`.

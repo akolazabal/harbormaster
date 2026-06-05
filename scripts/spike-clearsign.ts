@@ -28,7 +28,7 @@ async function main() {
 
   let resolution: any = null;
   try { const { ledgerService } = (await import("@ledgerhq/hw-app-eth")) as any; if (ledgerService?.resolveTransaction) { resolution = await ledgerService.resolveTransaction(serialized.slice(2), {}, { erc20: true, externalPlugins: true, nft: true }); console.log("resolution: OK (clear-sign descriptors loaded)"); } }
-  catch (e: any) { console.log("resolution: none —", e?.message ?? e); }
+  catch (e: any) { console.log("resolution: none -", e?.message ?? e); }
 
   const transport = await SpeculosTransport.open({ apduPort: 9999 });
   const eth = new Eth(transport);

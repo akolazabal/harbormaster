@@ -67,14 +67,14 @@ for f in ["legit-approve-00","legit-approve-01","legit-approve-02","legit-approv
 card([("SIGNED", TITLE(78), GREEN, 285), ("on the Ledger device, via the Device Management Kit", BODY(30), CREAM, 395)], 2.6)
 term(["event evt-002  ->  0x..dEaD      BLOCKED [denylist, allowlist]",
       "event evt-003  ->  999999 ETH    BLOCKED [per-tx cap, daily]",
-      "the deterministic policy refused — no tx was ever built"], 3.2)
+      "the deterministic policy refused - no tx was ever built"], 3.2)
 card([("ACT 2", TITLE(72), GOLD, 285), ("When the agent itself is compromised", BODY(36), CREAM, 390)], 2.4)
 term(["a fully compromised agent bypasses the policy layer",
       "and assembles the malicious transfer itself",
       "-> sent straight to the device"], 2.8)
 for f in ["attacker-reject-00","attacker-reject-01","attacker-reject-02","attacker-reject-03","attacker-reject-04","attacker-reject-05","attacker-reject-06","attacker-reject-07"]:
     dev(f, "ACT 2  ·  attacker address shown  ·  decline", 1.2)
-card([("REJECTED", TITLE(78), RED, 285), ("the hardware held the final authority — nothing moved", BODY(30), CREAM, 395)], 3.2)
+card([("REJECTED", TITLE(78), RED, 285), ("the hardware held the final authority - nothing moved", BODY(30), CREAM, 395)], 3.2)
 card([("Give the agent the work.", BODY(48), CREAM, 250),
       ("Keep the final authority in hardware.", TITLE(52), GOLD, 330),
       ("Harbormaster  ·  #LedgerSponsor", BODY(26), MUTE, 450)], 3.8)
