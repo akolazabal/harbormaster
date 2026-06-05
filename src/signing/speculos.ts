@@ -1,7 +1,7 @@
 import SpeculosTransport from "@ledgerhq/hw-transport-node-speculos";
 import Eth from "@ledgerhq/hw-app-eth";
 import type { SpeculosTransportOpts } from "@ledgerhq/hw-transport-node-speculos";
-import { createPublicClient, http, serializeTransaction, parseGwei } from "viem";
+import { createPublicClient, http, serializeTransaction, parseGwei, keccak256 } from "viem";
 import { baseSepolia } from "viem/chains";
 import type { SigningAdapter } from "./adapter.js";
 import type { UnsignedTx, SigningResult } from "../shared/types.js";
@@ -33,8 +33,9 @@ type EthLike = {
 
 type EthCtor = new (transport: SpeculosTransportLike) => EthLike;
 
-const SpeculosTransportCls = SpeculosTransport as unknown as SpeculosTransportCtor;
-const EthClass = Eth as unknown as EthCtor;
+// Resolve the class whether the package presents it as a default or namespace export (CJS/ESM interop).
+const SpeculosTransportCls = ((SpeculosTransport as any)?.default ?? SpeculosTransport) as unknown as SpeculosTransportCtor;
+const EthClass = ((Eth as any)?.default ?? Eth) as unknown as EthCtor;
 // ──────────────────────────────────────────────────────────────────────────────
 
 const DERIVATION = "44'/60'/0'/0/0";
@@ -52,7 +53,8 @@ export function speculosAdapter(opts: { rpcUrl: string; apduPort?: number }): Si
         const account = address as `0x${string}`;
         const nonce = await client.getTransactionCount({ address: account });
         const fees = await client.estimateFeesPerGas();
-        const gas = await client.estimateGas({ account, to: tx.to, data: tx.data, value: tx.value });
+        // Native transfers always cost 21000 gas; only estimate for contract calls (tolerating an unfunded account).
+        const gas = tx.data === "0x" ? 21000n : await client.estimateGas({ account, to: tx.to, data: tx.data, value: tx.value }).catch(() => 100000n);
 
         const unsigned = {
           to: tx.to, data: tx.data, value: tx.value, nonce, gas,
@@ -60,15 +62,18 @@ export function speculosAdapter(opts: { rpcUrl: string; apduPort?: number }): Si
           chainId: tx.chainId, type: "eip1559" as const,
         };
         const serialized = serializeTransaction(unsigned); // 0x-prefixed, unsigned
-        // ledgerService is not available in all installed versions; load lazily and fall back to null resolution
+        // Native transfers clear-sign natively (no resolution needed). For contract calls, load
+        // clear-signing descriptors lazily (ledgerService), falling back to null if unavailable.
         let resolution: unknown = null;
-        try {
-          const { ledgerService } = await import("@ledgerhq/hw-app-eth") as any;
-          if (ledgerService?.resolveTransaction) {
-            resolution = await ledgerService.resolveTransaction(serialized.slice(2), {}, {});
+        if (tx.data !== "0x") {
+          try {
+            const { ledgerService } = (await import("@ledgerhq/hw-app-eth")) as any;
+            if (ledgerService?.resolveTransaction) {
+              resolution = await ledgerService.resolveTransaction(serialized.slice(2), {}, {});
+            }
+          } catch {
+            // older hw-app-eth without ledgerService — proceed with null resolution
           }
-        } catch {
-          // older hw-app-eth without ledgerService — proceed with null resolution
         }
         const sig = await eth.signTransaction(DERIVATION, serialized.slice(2), resolution); // device prompts here
 
@@ -77,6 +82,11 @@ export function speculosAdapter(opts: { rpcUrl: string; apduPort?: number }): Si
           s: `0x${sig.s}` as `0x${string}`,
           v: BigInt(parseInt(sig.v, 16)),
         });
+        // The device approved. Broadcast unless explicitly disabled (HM_BROADCAST=0), which lets
+        // the signing flow be demonstrated on an unfunded testnet account (txHash is the signed tx's hash).
+        if (process.env.HM_BROADCAST === "0") {
+          return { status: "APPROVED", txHash: keccak256(signed) };
+        }
         const txHash = await client.sendRawTransaction({ serializedTransaction: signed });
         return { status: "APPROVED", txHash };
       } catch (e: any) {
