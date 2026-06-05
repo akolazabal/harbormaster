@@ -1,0 +1,11 @@
+{
+  "allowlist": [
+    { "name": "Caspian Freight LLP", "address": "0x1111111111111111111111111111111111111111" },
+    { "name": "Anatolia Logistics AS", "address": "0x2222222222222222222222222222222222222222" }
+  ],
+  "denylist": ["0x000000000000000000000000000000000000dEaD"],
+  "perTxCapUsdc": 10000,
+  "dailyCapUsdc": 25000,
+  "allowedChains": ["base-sepolia"],
+  "allowedAssets": ["USDC"]
+}
